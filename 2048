@@ -1,0 +1,84 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+const int SIZE = 4;
+vector<vector<int>> grid(SIZE, vector<int>(SIZE, 0));
+
+void printGrid() {
+    for (const auto& row : grid) {
+        for (int cell : row) {
+            cout << (cell ? to_string(cell) : ".") << "\t";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
+bool moveLeft() {
+    bool moved = false;
+    for (auto& row : grid) {
+        vector<int> temp;
+        for (int num : row) {
+            if (num) temp.push_back(num);
+        }
+        for (int i = 0; i < temp.size() - 1; ++i) {
+            if (temp[i] == temp[i + 1]) {
+                temp[i] *= 2;
+                temp[i + 1] = 0;
+                moved = true;
+            }
+        }
+        temp.erase(remove(temp.begin(), temp.end(), 0), temp.end());
+        while (temp.size() < SIZE) temp.push_back(0);
+        if (temp != row) moved = true;
+        row = temp;
+    }
+    return moved;
+}
+
+void addRandom() {
+    vector<pair<int, int>> empty;
+    for (int i = 0; i < SIZE; ++i) {
+        for (int j = 0; j < SIZE; ++j) {
+            if (grid[i][j] == 0) empty.push_back({i, j});
+        }
+    }
+    if (empty.empty()) return;
+    auto [x, y] = empty[rand() % empty.size()];
+    grid[x][y] = (rand() % 10 == 0) ? 4 : 2;
+}
+
+bool isGameOver() {
+    for (int i = 0; i < SIZE; ++i) {
+        for (int j = 0; j < SIZE; ++j) {
+            if (grid[i][j] == 0) return false;
+            if (j < SIZE - 1 && grid[i][j] == grid[i][j + 1]) return false;
+            if (i < SIZE - 1 && grid[i][j] == grid[i + 1][j]) return false;
+        }
+    }
+    return true;
+}
+
+int main() {
+    srand(time(0));
+    addRandom();
+    addRandom();
+    char move;
+    while (true) {
+        printGrid();
+        if (isGameOver()) {
+            cout << "Game Over!" << endl;
+            break;
+        }
+        cout << "Move (WASD): ";
+        cin >> move;
+        bool moved = false;
+        if (move == 'a') moved = moveLeft();
+        if (moved) addRandom();
+    }
+    return 0;
+}
