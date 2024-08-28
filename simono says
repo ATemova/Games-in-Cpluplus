@@ -1,0 +1,53 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+vector<int> sequence;
+vector<int> playerInput;
+
+void generateSequence() {
+    sequence.push_back(rand() % 4); // Randomly add a new color
+}
+
+void displaySequence() {
+    cout << "Sequence: ";
+    for (int num : sequence) {
+        cout << num << " "; // Display the sequence
+        // Add delay or animation here if desired
+    }
+    cout << endl;
+}
+
+bool checkSequence() {
+    if (playerInput.size() != sequence.size()) return false;
+    for (size_t i = 0; i < sequence.size(); ++i) {
+        if (playerInput[i] != sequence[i]) return false;
+    }
+    return true;
+}
+
+int main() {
+    srand(time(0));
+    char colors[] = {'R', 'G', 'B', 'Y'}; // Red, Green, Blue, Yellow
+
+    while (true) {
+        generateSequence();
+        displaySequence();
+        
+        cout << "Enter sequence: ";
+        playerInput.clear();
+        for (size_t i = 0; i < sequence.size(); ++i) {
+            char input;
+            cin >> input;
+            playerInput.push_back(input == 'R' ? 0 : input == 'G' ? 1 : input == 'B' ? 2 : 3);
+        }
+
+        if (!checkSequence()) {
+            cout << "Incorrect sequence! Game over." << endl;
+            break;
+        }
+    }
+    return 0;
+}
