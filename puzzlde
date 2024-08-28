@@ -1,0 +1,65 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <ctime>
+#include <cstdlib>
+
+using namespace std;
+
+const int SIZE = 4;
+vector<vector<int>> board(SIZE, vector<int>(SIZE));
+vector<vector<bool>> revealed(SIZE, vector<bool>(SIZE, false));
+
+void printBoard() {
+    for (const auto& row : board) {
+        for (int cell : row) {
+            cout << (revealed[cell] ? to_string(cell) : "?") << " ";
+        }
+        cout << endl;
+    }
+}
+
+void setupBoard() {
+    vector<int> numbers;
+    for (int i = 0; i < (SIZE * SIZE) / 2; ++i) {
+        numbers.push_back(i);
+        numbers.push_back(i);
+    }
+    random_shuffle(numbers.begin(), numbers.end());
+    for (int i = 0; i < SIZE; ++i) {
+        for (int j = 0; j < SIZE; ++j) {
+            board[i][j] = numbers.back();
+            numbers.pop_back();
+        }
+    }
+}
+
+bool checkMatch(int x1, int y1, int x2, int y2) {
+    return board[y1][x1] == board[y2][x2];
+}
+
+int main() {
+    srand(time(0));
+    setupBoard();
+    int x1, y1, x2, y2;
+    bool gameOver = false;
+    while (!gameOver) {
+        printBoard();
+        cout << "Enter coordinates for first card (x y): ";
+        cin >> x1 >> y1;
+        revealed[y1][x1] = true;
+        printBoard();
+        cout << "Enter coordinates for second card (x y): ";
+        cin >> x2 >> y2;
+        revealed[y2][x2] = true;
+        printBoard();
+        if (checkMatch(x1, y1, x2, y2)) {
+            cout << "Match found!" << endl;
+        } else {
+            cout << "No match." << endl;
+            revealed[y1][x1] = revealed[y2][x2] = false;
+        }
+        // Check for game over condition here
+    }
+    return 0;
+}
