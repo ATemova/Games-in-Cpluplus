@@ -1,0 +1,49 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+const int SIZE = 8;
+vector<vector<char>> board(SIZE, vector<char>(SIZE, ' '));
+
+void setupBoard() {
+    for (int i = 0; i < SIZE; ++i) {
+        for (int j = (i % 2 == 0) ? 1 : 0; j < SIZE; j += 2) {
+            if (i < 3) board[i][j] = 'b';  // Black pieces
+            else if (i > 4) board[i][j] = 'r';  // Red pieces
+        }
+    }
+}
+
+void printBoard() {
+    for (const auto& row : board) {
+        for (char cell : row) cout << cell << " ";
+        cout << endl;
+    }
+}
+
+bool isValidMove(int x1, int y1, int x2, int y2, char piece) {
+    // Simple move validation (not complete)
+    return (x2 >= 0 && x2 < SIZE && y2 >= 0 && y2 < SIZE && board[y2][x2] == ' ');
+}
+
+void movePiece(int x1, int y1, int x2, int y2) {
+    char piece = board[y1][x1];
+    if (isValidMove(x1, y1, x2, y2, piece)) {
+        board[y2][x2] = piece;
+        board[y1][x1] = ' ';
+    }
+}
+
+int main() {
+    setupBoard();
+    printBoard();
+    int x1, y1, x2, y2;
+    while (true) {
+        cout << "Enter move (x1 y1 x2 y2): ";
+        cin >> x1 >> y1 >> x2 >> y2;
+        movePiece(x1, y1, x2, y2);
+        printBoard();
+    }
+    return 0;
+}
