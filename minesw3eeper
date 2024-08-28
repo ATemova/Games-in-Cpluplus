@@ -1,0 +1,87 @@
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <cstdlib>
+
+using namespace std;
+
+const int WIDTH = 10;
+const int HEIGHT = 10;
+const int MINES = 10;
+vector<vector<int>> field(HEIGHT, vector<int>(WIDTH, 0));
+vector<vector<bool>> revealed(HEIGHT, vector<bool>(WIDTH, false));
+vector<vector<bool>> flagged(HEIGHT, vector<bool>(WIDTH, false));
+
+void printBoard() {
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            if (flagged[y][x]) cout << "F ";
+            else if (!revealed[y][x]) cout << "# ";
+            else if (field[y][x] == -1) cout << "* ";
+            else cout << field[y][x] << " ";
+        }
+        cout << endl;
+    }
+}
+
+void placeMines() {
+    srand(time(0));
+    for (int i = 0; i < MINES;) {
+        int x = rand() % WIDTH;
+        int y = rand() % HEIGHT;
+        if (field[y][x] != -1) {
+            field[y][x] = -1;
+            ++i;
+            for (int dx = -1; dx <= 1; ++dx) {
+                for (int dy = -1; dy <= 1; ++dy) {
+                    int nx = x + dx;
+                    int ny = y + dy;
+                    if (nx >= 0 && nx < WIDTH && ny >= 0 && ny < HEIGHT && field[ny][nx] != -1) {
+                        ++field[ny][nx];
+                    }
+                }
+            }
+        }
+    }
+}
+
+bool isValid(int x, int y) {
+    return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT;
+}
+
+void reveal(int x, int y) {
+    if (!isValid(x, y) || revealed[y][x] || flagged[y][x]) return;
+    revealed[y][x] = true;
+    if (field[y][x] == 0) {
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                if (dx != 0 || dy != 0) reveal(x + dx, y + dy);
+            }
+        }
+    }
+}
+
+void flag(int x, int y) {
+    if (isValid(x, y)) flagged[y][x] = !flagged[y][x];
+}
+
+int main() {
+    placeMines();
+    while (true) {
+        printBoard();
+        char command;
+        int x, y;
+        cout << "Enter command (r: reveal, f: flag) and coordinates (x y): ";
+        cin >> command >> x >> y;
+        if (command == 'r') {
+            if (field[y][x] == -1) {
+                cout << "Game Over!" << endl;
+                break;
+            }
+            reveal(x, y);
+        } else if (command == 'f') {
+            flag(x, y);
+        }
+    }
+    return 0;
+}
