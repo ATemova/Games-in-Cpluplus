@@ -1,0 +1,56 @@
+#include <iostream>
+#include <map>
+#include <vector>
+
+using namespace std;
+
+struct Room {
+    string description;
+    map<string, string> exits;
+    vector<string> items;
+};
+
+map<string, Room> rooms = {
+    {"Start", {"You are in a small room with a wooden door.", {{"north", "Hallway"}}, {"key"}}},
+    {"Hallway", {"You are in a long hallway with doors to the east and west.", {{"south", "Start"}, {"east", "Library"}, {"west", "Cellar"}}, {}}},
+    {"Library", {"You are in a library with shelves full of books.", {{"west", "Hallway"}}, {"book"}}},
+    {"Cellar", {"You are in a dark, damp cellar with a single exit to the east.", {{"east", "Hallway"}}, {}}},
+};
+
+string currentRoom = "Start";
+
+void look() {
+    Room& room = rooms[currentRoom];
+    cout << room.description << endl;
+    if (!room.items.empty()) {
+        cout << "You see: ";
+        for (const string& item : room.items) {
+            cout << item << " ";
+        }
+        cout << endl;
+    }
+}
+
+void move(const string& direction) {
+    Room& room = rooms[currentRoom];
+    if (room.exits.find(direction) != room.exits.end()) {
+        currentRoom = room.exits[direction];
+        look();
+    } else {
+        cout << "You can't go that way." << endl;
+    }
+}
+
+int main() {
+    string command;
+    look();
+    while (true) {
+        cout << "> ";
+        getline(cin, command);
+        if (command == "quit") break;
+        else if (command == "look") look();
+        else if (command == "north" || command == "south" || command == "east" || command == "west") move(command);
+        else cout << "Unknown command." << endl;
+    }
+    return 0;
+}
