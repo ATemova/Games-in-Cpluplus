@@ -1,0 +1,87 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <conio.h>
+
+using namespace std;
+
+const int WIDTH = 40;
+const int HEIGHT = 20;
+const int PADDLE_WIDTH = 5;
+const int BALL_SIZE = 1;
+const int BRICK_ROWS = 5;
+const int BRICK_COLS = 8;
+
+struct Paddle {
+    int x;
+};
+
+struct Ball {
+    int x, y, dx, dy;
+};
+
+vector<vector<bool>> bricks(BRICK_ROWS, vector<bool>(BRICK_COLS, true));
+
+Paddle paddle = {WIDTH / 2 - PADDLE_WIDTH / 2};
+Ball ball = {WIDTH / 2, HEIGHT - 3, 1, -1};
+
+void draw() {
+    system("cls");
+    for (int i = 0; i < WIDTH + 2; ++i) cout << "-";
+    cout << endl;
+
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            if (x == 0) cout << "#";
+            if (x >= paddle.x && x < paddle.x + PADDLE_WIDTH && y == HEIGHT - 1) cout << "=";
+            else if (x == ball.x && y == ball.y) cout << "O";
+            else if (y < BRICK_ROWS && bricks[y][x]) cout << "#";
+            else cout << " ";
+        }
+        cout << "#" << endl;
+    }
+    for (int i = 0; i < WIDTH + 2; ++i) cout << "-";
+    cout << endl;
+}
+
+void update() {
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    if (ball.x <= 0 || ball.x >= WIDTH - BALL_SIZE) ball.dx *= -1;
+    if (ball.y <= 0) ball.dy *= -1;
+    if (ball.y >= HEIGHT - BALL_SIZE) {
+        if (ball.x >= paddle.x && ball.x < paddle.x + PADDLE_WIDTH) ball.dy *= -1;
+        else {
+            cout << "Game Over!" << endl;
+            exit(0);
+        }
+    }
+
+    for (int i = 0; i < BRICK_ROWS; ++i) {
+        for (int j = 0; j < BRICK_COLS; ++j) {
+            if (bricks[i][j] && ball.x >= j && ball.x < j + 1 && ball.y >= i && ball.y < i + 1) {
+                bricks[i][j] = false;
+                ball.dy *= -1;
+            }
+        }
+    }
+}
+
+int main() {
+    srand(time(0));
+
+    while (true) {
+        draw();
+        if (_kbhit()) {
+            char ch = _getch();
+            if (ch == 'a' && paddle.x > 0) paddle.x--;
+            if (ch == 'd' && paddle.x < WIDTH - PADDLE_WIDTH) paddle.x++;
+        }
+
+        update();
+        Sleep(50);
+    }
+    return 0;
+}
