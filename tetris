@@ -1,0 +1,101 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <conio.h>
+
+using namespace std;
+
+const int WIDTH = 10;
+const int HEIGHT = 20;
+vector<vector<int>> field(HEIGHT, vector<int>(WIDTH, 0));
+
+enum Tetromino { I, O, T, S, Z, J, L };
+Tetromino currentPiece;
+int pieceX, pieceY;
+
+const vector<vector<vector<int>>> tetrominoes = {
+    {{1, 1, 1, 1}},          // I
+    {{1, 1}, {1, 1}},        // O
+    {{0, 1, 0}, {1, 1, 1}},  // T
+    {{0, 1, 1}, {1, 1, 0}},  // S
+    {{1, 1, 0}, {0, 1, 1}},  // Z
+    {{1, 0, 0}, {1, 1, 1}},  // J
+    {{0, 0, 1}, {1, 1, 1}}   // L
+};
+
+void Draw() {
+    system("cls");
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            if (field[y][x]) cout << "#";
+            else cout << ".";
+        }
+        cout << endl;
+    }
+}
+
+bool CheckCollision(int dx, int dy, const vector<vector<int>>& shape) {
+    for (int y = 0; y < shape.size(); ++y) {
+        for (int x = 0; x < shape[y].size(); ++x) {
+            if (shape[y][x]) {
+                int newX = pieceX + x + dx;
+                int newY = pieceY + y + dy;
+                if (newX < 0 || newX >= WIDTH || newY >= HEIGHT || field[newY][newX]) return true;
+            }
+        }
+    }
+    return false;
+}
+
+void MergePiece() {
+    const auto& shape = tetrominoes[currentPiece];
+    for (int y = 0; y < shape.size(); ++y) {
+        for (int x = 0; x < shape[y].size(); ++x) {
+            if (shape[y][x]) field[pieceY + y][pieceX + x] = 1;
+        }
+    }
+}
+
+void RotatePiece() {
+    const auto& shape = tetrominoes[currentPiece];
+    vector<vector<int>> rotatedShape(shape[0].size(), vector<int>(shape.size()));
+    for (int y = 0; y < shape.size(); ++y) {
+        for (int x = 0; x < shape[y].size(); ++x) {
+            rotatedShape[x][shape.size() - 1 - y] = shape[y][x];
+        }
+    }
+    if (!CheckCollision(0, 0, rotatedShape)) {
+        // Replace the shape with the rotated shape
+    }
+}
+
+void MovePiece(int dx, int dy) {
+    if (!CheckCollision(dx, dy, tetrominoes[currentPiece])) {
+        pieceX += dx;
+        pieceY += dy;
+    } else if (dy > 0) {
+        MergePiece();
+        // Check for completed lines and generate new piece
+    }
+}
+
+int main() {
+    srand(time(0));
+    currentPiece = static_cast<Tetromino>(rand() % 7);
+    pieceX = WIDTH / 2 - 2;
+    pieceY = 0;
+    
+    while (true) {
+        Draw();
+        if (_kbhit()) {
+            char c = _getch();
+            if (c == 'a') MovePiece(-1, 0);
+            if (c == 'd') MovePiece(1, 0);
+            if (c == 's') MovePiece(0, 1);
+            if (c == 'w') RotatePiece();
+        }
+        Sleep(500);
+    }
+    return 0;
+}
