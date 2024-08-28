@@ -1,0 +1,76 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <conio.h> // For _kbhit() and _getch()
+
+using namespace std;
+
+const int WIDTH = 40;
+const int HEIGHT = 20;
+
+struct Paddle {
+    int x, y;
+    void move(int dy) { y += dy; }
+};
+
+struct Ball {
+    int x, y, dx, dy;
+    void move() { x += dx; y += dy; }
+};
+
+Paddle player = {1, HEIGHT / 2};
+Paddle ai = {WIDTH - 2, HEIGHT / 2};
+Ball ball = {WIDTH / 2, HEIGHT / 2, 1, 1};
+
+void draw() {
+    system("cls");
+    for (int i = 0; i < WIDTH + 2; ++i) cout << "-";
+    cout << endl;
+
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            if (x == 0) cout << "#";
+            if (x == player.x && y >= player.y && y < player.y + 3) cout << "#";
+            else if (x == ai.x && y >= ai.y && y < ai.y + 3) cout << "#";
+            else if (x == ball.x && y == ball.y) cout << "O";
+            else cout << " ";
+        }
+        cout << "#" << endl;
+    }
+    for (int i = 0; i < WIDTH + 2; ++i) cout << "-";
+    cout << endl;
+}
+
+void updateAI() {
+    if (ball.y < ai.y) ai.move(-1);
+    else if (ball.y > ai.y + 2) ai.move(1);
+}
+
+int main() {
+    srand(time(0));
+
+    while (true) {
+        draw();
+        if (_kbhit()) {
+            char ch = _getch();
+            if (ch == 'w') player.move(-1);
+            else if (ch == 's') player.move(1);
+        }
+
+        ball.move();
+        if (ball.y <= 0 || ball.y >= HEIGHT - 1) ball.dy *= -1;
+
+        if (ball.x == player.x + 1 && ball.y >= player.y && ball.y < player.y + 3) ball.dx *= -1;
+        else if (ball.x == ai.x - 1 && ball.y >= ai.y && ball.y < ai.y + 3) ball.dx *= -1;
+
+        updateAI();
+
+        if (ball.x <= 0 || ball.x >= WIDTH) {
+            cout << (ball.x <= 0 ? "AI wins!" : "Player wins!") << endl;
+            break;
+        }
+
+        Sleep(50); // Slow down the game loop
+    }
+    return 0;
+}
