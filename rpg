@@ -1,0 +1,56 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+struct Character {
+    int health;
+    int attack;
+    int defense;
+};
+
+void printStatus(const Character& player, const Character& enemy) {
+    cout << "Player: Health=" << player.health << ", Attack=" << player.attack << ", Defense=" << player.defense << endl;
+    cout << "Enemy: Health=" << enemy.health << ", Attack=" << enemy.attack << ", Defense=" << enemy.defense << endl;
+}
+
+int main() {
+    srand(time(0));
+
+    Character player = {100, 20, 10};
+    Character enemy = {100, 15, 5};
+
+    while (player.health > 0 && enemy.health > 0) {
+        printStatus(player, enemy);
+        cout << "Choose action (1: Attack, 2: Defend, 3: Heal): ";
+        int choice;
+        cin >> choice;
+
+        int playerAttack = player.attack;
+        int enemyAttack = enemy.attack;
+
+        if (choice == 1) { // Attack
+            enemy.health -= playerAttack - enemy.defense;
+            cout << "You attack the enemy for " << playerAttack - enemy.defense << " damage!" << endl;
+        } else if (choice == 2) { // Defend
+            player.defense += 5;
+            cout << "You increase your defense!" << endl;
+        } else if (choice == 3) { // Heal
+            player.health += 20;
+            cout << "You heal yourself for 20 health!" << endl;
+        } else {
+            cout << "Invalid choice!" << endl;
+        }
+
+        if (enemy.health > 0) {
+            player.health -= enemyAttack - player.defense;
+            cout << "The enemy attacks you for " << enemyAttack - player.defense << " damage!" << endl;
+        }
+    }
+
+    if (player.health <= 0) cout << "Game Over! You were defeated." << endl;
+    else cout << "Congratulations! You defeated the enemy." << endl;
+
+    return 0;
+}
