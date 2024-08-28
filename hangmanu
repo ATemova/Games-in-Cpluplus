@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+const vector<string> words = {"programming", "hangman", "computer", "game", "algorithm"};
+string selectedWord;
+string guessedWord;
+vector<char> wrongGuesses;
+int maxTries = 6;
+
+void displayWord() {
+    for (char c : guessedWord) cout << c << " ";
+    cout << endl;
+}
+
+bool isGameOver() {
+    return wrongGuesses.size() >= maxTries || guessedWord == selectedWord;
+}
+
+int main() {
+    srand(time(0));
+    selectedWord = words[rand() % words.size()];
+    guessedWord = string(selectedWord.size(), '_');
+    while (!isGameOver()) {
+        cout << "Current word: ";
+        displayWord();
+        cout << "Wrong guesses: ";
+        for (char c : wrongGuesses) cout << c << " ";
+        cout << endl;
+
+        char guess;
+        cout << "Enter a letter: ";
+        cin >> guess;
+
+        bool found = false;
+        for (int i = 0; i < selectedWord.size(); ++i) {
+            if (selectedWord[i] == guess) {
+                guessedWord[i] = guess;
+                found = true;
+            }
+        }
+        if (!found) {
+            wrongGuesses.push_back(guess);
+        }
+
+        if (guessedWord == selectedWord) {
+            cout << "Congratulations! You've guessed the word: " << selectedWord << endl;
+            break;
+        }
+        if (wrongGuesses.size() >= maxTries) {
+            cout << "Game Over! The word was: " << selectedWord << endl;
+            break;
+        }
+    }
+    return 0;
+}
