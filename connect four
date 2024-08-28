@@ -1,0 +1,67 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+const int ROWS = 6;
+const int COLS = 7;
+vector<vector<char>> board(ROWS, vector<char>(COLS, ' '));
+
+void printBoard() {
+    for (const auto& row : board) {
+        for (char cell : row) cout << "|" << cell;
+        cout << "|\n";
+    }
+    for (int i = 0; i < COLS; ++i) cout << "--";
+    cout << "-" << endl;
+}
+
+bool dropPiece(int col, char piece) {
+    for (int row = ROWS - 1; row >= 0; --row) {
+        if (board[row][col] == ' ') {
+            board[row][col] = piece;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool checkWin(char piece) {
+    // Check horizontal, vertical, and diagonal
+    for (int row = 0; row < ROWS; ++row) {
+        for (int col = 0; col < COLS; ++col) {
+            if (board[row][col] == piece) {
+                if (col + 3 < COLS && board[row][col + 1] == piece && board[row][col + 2] == piece && board[row][col + 3] == piece)
+                    return true;
+                if (row + 3 < ROWS && board[row + 1][col] == piece && board[row + 2][col] == piece && board[row + 3][col] == piece)
+                    return true;
+                if (row + 3 < ROWS && col + 3 < COLS && board[row + 1][col + 1] == piece && board[row + 2][col + 2] == piece && board[row + 3][col + 3] == piece)
+                    return true;
+                if (row - 3 >= 0 && col + 3 < COLS && board[row - 1][col + 1] == piece && board[row - 2][col + 2] == piece && board[row - 3][col + 3] == piece)
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
+int main() {
+    printBoard();
+    char player = 'X';
+    while (true) {
+        int col;
+        cout << "Player " << player << ", choose a column (0-6): ";
+        cin >> col;
+        if (col < 0 || col >= COLS || !dropPiece(col, player)) {
+            cout << "Invalid move, try again." << endl;
+            continue;
+        }
+        printBoard();
+        if (checkWin(player)) {
+            cout << "Player " << player << " wins!" << endl;
+            break;
+        }
+        player = (player == 'X') ? 'O' : 'X';
+    }
+    return 0;
+}
