@@ -1,0 +1,67 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+const int SIZE = 5;
+vector<vector<char>> playerBoard(SIZE, vector<char>(SIZE, '~'));
+vector<vector<char>> computerBoard(SIZE, vector<char>(SIZE, '~'));
+vector<vector<char>> computerShots(SIZE, vector<char>(SIZE, '~'));
+
+void printBoard(const vector<vector<char>>& board) {
+    for (const auto& row : board) {
+        for (char cell : row) cout << cell << " ";
+        cout << endl;
+    }
+}
+
+void setupComputerBoard() {
+    for (int i = 0; i < 3; ++i) {
+        int x = rand() % SIZE;
+        int y = rand() % SIZE;
+        computerBoard[y][x] = 'S';
+    }
+}
+
+bool makeMove(int x, int y) {
+    if (computerBoard[y][x] == 'S') {
+        computerBoard[y][x] = 'X';
+        return true;
+    } else {
+        computerBoard[y][x] = 'O';
+        return false;
+    }
+}
+
+void computerMove() {
+    int x = rand() % SIZE;
+    int y = rand() % SIZE;
+    while (computerShots[y][x] != '~') {
+        x = rand() % SIZE;
+        y = rand() % SIZE;
+    }
+    computerShots[y][x] = (playerBoard[y][x] == 'S') ? 'X' : 'O';
+}
+
+int main() {
+    srand(time(0));
+    setupComputerBoard();
+    int x, y;
+    while (true) {
+        cout << "Enter coordinates (x y): ";
+        cin >> x >> y;
+        if (makeMove(x, y)) {
+            cout << "Hit!" << endl;
+        } else {
+            cout << "Miss." << endl;
+        }
+        computerMove();
+        cout << "Your board:\n";
+        printBoard(playerBoard);
+        cout << "Computer's shots:\n";
+        printBoard(computerShots);
+    }
+    return 0;
+}
