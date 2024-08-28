@@ -1,0 +1,89 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+enum Card { TWO = 2, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK = 10, QUEEN = 10, KING = 10, ACE = 11 };
+
+vector<Card> deck;
+
+void initializeDeck() {
+    deck.clear();
+    for (int i = 0; i < 4; ++i) {
+        for (int j = TWO; j <= ACE; ++j) {
+            deck.push_back(static_cast<Card>(j));
+        }
+    }
+    random_shuffle(deck.begin(), deck.end());
+}
+
+Card drawCard() {
+    Card card = deck.back();
+    deck.pop_back();
+    return card;
+}
+
+int calculateScore(const vector<Card>& hand) {
+    int score = 0, aces = 0;
+    for (Card card : hand) {
+        score += card;
+        if (card == ACE) ++aces;
+    }
+    while (score > 21 && aces > 0) {
+        score -= 10;
+        --aces;
+    }
+    return score;
+}
+
+void printHand(const vector<Card>& hand, const string& name) {
+    cout << name << "'s hand: ";
+    for (Card card : hand) {
+        cout << card << " ";
+    }
+    cout << "Score: " << calculateScore(hand) << endl;
+}
+
+int main() {
+    srand(time(0));
+    initializeDeck();
+
+    vector<Card> playerHand = { drawCard(), drawCard() };
+    vector<Card> dealerHand = { drawCard(), drawCard() };
+
+    printHand(playerHand, "Player");
+    printHand(dealerHand, "Dealer");
+
+    char action;
+    while (calculateScore(playerHand) < 21) {
+        cout << "Hit or Stand (h/s)? ";
+        cin >> action;
+        if (action == 'h') {
+            playerHand.push_back(drawCard());
+            printHand(playerHand, "Player");
+        } else if (action == 's') {
+            break;
+        }
+    }
+
+    if (calculateScore(playerHand) > 21) {
+        cout << "Player busts!" << endl;
+        return 0;
+    }
+
+    while (calculateScore(dealerHand) < 17) {
+        dealerHand.push_back(drawCard());
+    }
+    printHand(dealerHand, "Dealer");
+
+    int playerScore = calculateScore(playerHand);
+    int dealerScore = calculateScore(dealerHand);
+
+    if (dealerScore > 21 || playerScore > dealerScore) cout << "Player wins!" << endl;
+    else if (playerScore < dealerScore) cout << "Dealer wins!" << endl;
+    else cout << "It's a tie!" << endl;
+
+    return 0;
+}
