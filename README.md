@@ -1,2 +1,3 @@
 # Games-in-Cp++
-Unpublished games in C++
+### Unpublished games in C++
+**C++** is a powerful, high-performance programming language that extends the C programming language with object-oriented and generic programming features. Developed by Bjarne Stroustrup in the early 1980s, C++ supports a wide range of programming paradigms, including procedural, object-oriented, and functional programming. It provides low-level memory manipulation capabilities, which allows for fine-grained control over system resources, making it ideal for system programming, game development, and applications requiring high performance. C++ introduces features such as classes, inheritance, polymorphism, and templates, enabling the creation of complex and reusable code. Its standard library includes a rich set of functions and classes for tasks ranging from basic I/O to advanced data structures and algorithms, making it a versatile choice for a broad spectrum of programming challenges.
